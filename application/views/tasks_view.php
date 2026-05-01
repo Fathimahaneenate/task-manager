@@ -17,17 +17,20 @@
 
         <h2 class="mb-4 text-center">Task Manager</h2>
 
-          <?php
-            $total = count($tasks ?? []);
-            $completed_count = 0;
-            $urgent_count = 0;
-            foreach (($tasks ?? []) as $t) {
-                if ($t->status == 'completed') $completed_count++;
-                $diff = strtotime($t->due_date) - time();
-                if ($diff > 0 && $diff <= 86400) $urgent_count++;
-            }
+        <?php
+        $total = count($tasks ?? []);
+        $completed_count = 0;
+        $pending_count = 0;
+        $urgent_count = 0;
+        foreach (($tasks ?? []) as $t) {
+            if ($t->status == 'completed') $completed_count++;
+            // if ($t->status == 'pending') 
+              else $pending_count++;  
+            $diff = strtotime($t->due_date) - time();
+            if ($diff > 0 && $diff <= 86400) $urgent_count++;
+        }
         ?>
-  <div class="row mb-4 text-center">
+        <div class="row mb-4 text-center">
             <div class="col-md-4">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body">
@@ -45,20 +48,21 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body">
-                        <h6 class="text-muted mb-1">Urgent (24h)</h6>
-                        <h3 class="fw-bold <?= $urgent_count > 0 ? 'text-danger' : 'text-muted' ?> mb-0"><?= $urgent_count ?></h3>
-                    </div>
-                </div>
-            </div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h6 class="text-muted mb-1">Pending</h6>
+            <h3 class="fw-bold text-warning mb-0"><?= $pending_count ?></h3>
+        </div>
+    </div>
+</div>
+            
         </div>
         <?php if ($this->session->flashdata('error')): ?>
             <div class="alert alert-danger text-center">
                 <?= $this->session->flashdata('error'); ?>
             </div>
         <?php endif; ?>
-        
+
         <form method="post" action="<?= base_url('index.php/tasks/add'); ?>" class="row g-3 mb-4">
 
             <div class="col-md-4">
@@ -84,30 +88,30 @@
         </form>
 
         <hr>
-       
-<div class="mb-3 d-flex justify-content-between align-items-center">
-    <div>
-        <a href="<?= base_url('index.php/tasks?status=all'); ?>"
-            class="btn btn-sm <?= empty($this->input->get('status')) ? 'btn-dark' : 'btn-secondary'; ?>">
-            All
-        </a>
-        <a href="<?= base_url('index.php/tasks?status=pending'); ?>"
-            class="btn btn-sm <?= $this->input->get('status') == 'pending' ? 'btn-dark' : 'btn-warning'; ?>">
-            Pending
-        </a>
-        <a href="<?= base_url('index.php/tasks?status=completed'); ?>"
-            class="btn btn-sm <?= $this->input->get('status') == 'completed' ? 'btn-dark' : 'btn-success'; ?>">
-            Completed
-        </a>
-    </div>
-    <div>
-        <a href="<?= base_url('index.php/tasks?sort=due_date'); ?>" class="btn btn-outline-dark btn-sm">↕ Sort by Date</a>
-        <a href="<?= base_url('index.php/tasks?sort=priority'); ?>" class="btn btn-outline-dark btn-sm">↕ Sort by Priority</a>
-    </div>
-</div>
+
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            <div>
+                <a href="<?= base_url('index.php/tasks?status=all'); ?>"
+                    class="btn btn-sm <?= empty($this->input->get('status')) ? 'btn-dark' : 'btn-secondary'; ?>">
+                    All
+                </a>
+                <a href="<?= base_url('index.php/tasks?status=pending'); ?>"
+                    class="btn btn-sm <?= $this->input->get('status') == 'pending' ? 'btn-dark' : 'btn-warning'; ?>">
+                    Pending
+                </a>
+                <a href="<?= base_url('index.php/tasks?status=completed'); ?>"
+                    class="btn btn-sm <?= $this->input->get('status') == 'completed' ? 'btn-dark' : 'btn-success'; ?>">
+                    Completed
+                </a>
+            </div>
+            <div>
+                <a href="<?= base_url('index.php/tasks?sort=due_date'); ?>" class="btn btn-outline-dark btn-sm">↕ Sort by Date</a>
+                <a href="<?= base_url('index.php/tasks?sort=priority'); ?>" class="btn btn-outline-dark btn-sm">↕ Sort by Priority</a>
+            </div>
+        </div>
 
         <br><br>
-        
+
 
         <table class="table table-bordered table-hover">
 
@@ -128,20 +132,20 @@
                         $due_time = strtotime($task->due_date);
                         $now = time();
                         $diff_seconds = $due_time - $now;
-                       
-$is_urgent = ($diff_seconds <= 86400 && $task->status != 'completed');
-$is_overdue = ($diff_seconds < 0 && $task->status != 'completed');
+
+                        $is_urgent = ($diff_seconds <= 86400 && $task->status != 'completed');
+                        $is_overdue = ($diff_seconds < 0 && $task->status != 'completed');
                         // $is_urgent = ($diff_seconds > 0 && $diff_seconds <= 86400);
 
                     ?>
-<tr class="<?= ($is_urgent || $is_overdue) ? 'table-danger' : ''; ?>">
-    <td>
-        <?= $task->title; ?>
-        <?php if ($is_overdue): ?>
-            <span class="badge bg-danger ms-2">Due time finished</span>
-        <?php endif; ?>
-    </td>
-                        <!-- <tr class="<?= $is_urgent ? 'table-danger' : ''; ?>">
+                        <tr class="<?= ($is_urgent || $is_overdue) ? 'table-danger' : ''; ?>">
+                            <td>
+                                <?= $task->title; ?>
+                                <?php if ($is_overdue): ?>
+                                    <span class="badge bg-danger ms-2">Due time finished</span>
+                                <?php endif; ?>
+                            </td>
+                            <!-- <tr class="<?= $is_urgent ? 'table-danger' : ''; ?>">
                             <td><?= $task->title; ?></td> -->
                             <!-- <td><?= $task->due_date; ?></td> -->
                             <td><?= date('d M Y h:i A', strtotime($task->due_date)); ?></td>
@@ -165,7 +169,7 @@ $is_overdue = ($diff_seconds < 0 && $task->status != 'completed');
                                 <?php endif; ?>
                             </td>
 
-                            
+
                             <td>
                                 <?php if ($task->status != 'completed'): ?>
                                     <a href="<?= base_url('index.php/tasks/complete/' . $task->id); ?>" class="btn btn-success btn-sm">
