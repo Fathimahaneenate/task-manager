@@ -52,7 +52,8 @@ public function get_tasks($status = null, $sort = null)
             'pending' => $pending
         ];
     }
-    public function delete_task($id) {
-    return $this->db->delete('tasks', ['id' => $id]);
-}
+
+//     public function delete_task($id) {
+//     return $this->db->delete('tasks', ['id' => $id]);
+// }
 }

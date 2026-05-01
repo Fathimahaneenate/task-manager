@@ -12,7 +12,7 @@ class Tasks extends CI_Controller
     {
         parent::__construct();
         $this->load->model('Task_model');
-         $this->load->library('session');
+        $this->load->library('session');
     }
 
     public function index()
@@ -21,15 +21,13 @@ class Tasks extends CI_Controller
         $status = $this->input->get('status');
 
         $sort   = $this->input->get('sort');
- if ($status === null || $status === '') {
-        $status = 'pending';
-    }
-    // if (empty($status)) {
-    //     $status = 'pending';
-    // }
-     if ($status == 'all') {
-        $status = null;
-    }
+        if ($status === null || $status === '') {
+            $status = 'pending';
+        }
+
+        if ($status == 'all') {
+            $status = null;
+        }
         $data['tasks'] = $this->Task_model->get_tasks($status, $sort);
         $data['counts'] = $this->Task_model->get_counts();
         $this->load->view('tasks_view', $data);
@@ -42,8 +40,8 @@ class Tasks extends CI_Controller
 
         if (strtotime($due_date) < time()) {
             $this->session->set_flashdata('error', 'Past date not allowed');
-    redirect('tasks');
-    return;
+            redirect('tasks');
+            return;
         }
 
         $this->Task_model->insert_task([
@@ -60,9 +58,9 @@ class Tasks extends CI_Controller
         $this->Task_model->mark_complete($id);
         redirect('tasks');
     }
-    public function delete($id)
-    {
-        $this->Task_model->delete_task($id);
-        redirect('tasks');
-    }
+    // public function delete($id)
+    // {
+    //     $this->Task_model->delete_task($id);
+    //     redirect('tasks');
+    // }
 }
